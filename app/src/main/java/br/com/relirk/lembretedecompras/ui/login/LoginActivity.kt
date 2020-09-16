@@ -1,45 +1,54 @@
 package br.com.relirk.lembretedecompras.ui.login
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import br.com.relirk.lembretedecompras.R
 import br.com.relirk.lembretedecompras.models.RequestState
 import br.com.relirk.lembretedecompras.models.Usuario
 import br.com.relirk.lembretedecompras.ui.main.MainActivity
 import kotlinx.android.synthetic.main.activity_login.*
-import java.util.*
 
 class LoginActivity : AppCompatActivity() {
-
-    private lateinit var animacaoDoMascote : Animation
-    private lateinit var animacaoDoFormulario : Animation
+    private lateinit var animacaoDoMascote: Animation
+    private lateinit var animacaoDoFormulario: Animation
 
     private lateinit var loginViewModel: LoginViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
         iniciarAnimacao()
         esconderTeclado()
 
         iniciarListener()
         iniciarViewModel()
         iniciarObserver()
+
+        loginViewModel.getUsuarioLogado()
+    }
+
+    private fun iniciarAnimacao() {
+        animacaoDoMascote = AnimationUtils.loadAnimation(this, R.anim.frombottom)
+        animacaoDoFormulario = AnimationUtils.loadAnimation(this, R.anim.frombottom2)
+        containerLogin.clearAnimation()
+        ivLogin.clearAnimation()
+        containerLogin.startAnimation(animacaoDoMascote)
+        ivLogin.startAnimation(animacaoDoFormulario)
+    }
+
+    private fun esconderTeclado() {
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
     }
 
     private fun iniciarListener() {
         btLogin.setOnClickListener {
-            loginViewModel.logar(
-                Usuario(etEmail.text.toString(),
-                    etPassword.text.toString())
-            )
+            loginViewModel.doLogin(Usuario(etEmail.text.toString(), etPassword.text.toString()))
         }
 
         etPassword.setOnFocusChangeListener { v, hasFocus ->
@@ -55,14 +64,15 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
+
     private fun iniciarViewModel() {
         loginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
     }
 
     private fun iniciarObserver() {
-        loginViewModel.loginState.observe(this, androidx.lifecycle.Observer {  requestState ->
 
-            when (requestState) {
+        loginViewModel.loginState.observe(this, Observer {
+            when (it) {
                 is RequestState.Success -> {
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()
@@ -70,30 +80,24 @@ class LoginActivity : AppCompatActivity() {
                 is RequestState.Error -> {
                     val animShake = AnimationUtils.loadAnimation(this, R.anim.shake)
                     containerLogin.startAnimation(animShake)
-                    tvPasswordFeedback.text = requestState.throwable.message
+                    tvPasswordFeedback.text = it.throwable.message
                 }
                 is RequestState.Loading -> {
-                    Toast.makeText(this, "Carregando", Toast.LENGTH_LONG).show()
                 }
             }
-
+        })
+        loginViewModel.usuarioLogadoState.observe(this, Observer {
+            when (it) {
+                is RequestState.Success -> {
+                    etEmail.setText(it.data)
+                }
+                is RequestState.Error -> {
+                }
+                is RequestState.Loading -> {
+                }
+            }
         })
     }
 
-    private fun iniciarAnimacao() {
-        animacaoDoMascote = AnimationUtils.loadAnimation(this,
-            R.anim.frombottom
-        )
-        animacaoDoFormulario = AnimationUtils.loadAnimation(this,
-            R.anim.frombottom2
-        )
 
-        containerLogin.startAnimation(animacaoDoMascote)
-        ivLogin.startAnimation(animacaoDoFormulario)
-    }
-
-    private fun esconderTeclado() {
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
-    }
 }
-

@@ -1,25 +1,40 @@
 package br.com.relirk.lembretedecompras.repository
 
+import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import br.com.relirk.lembretedecompras.models.RequestState
 import br.com.relirk.lembretedecompras.models.Usuario
 
-class UsuarioRepository {
+class UsuarioRepository(val context: Context) {
 
+    fun logar(usuario: Usuario): LiveData<RequestState<String>> {
+        val response = MutableLiveData<RequestState<String>>()
 
-    fun logar(usuario: Usuario) : MutableLiveData<RequestState<Boolean>> {
-
-        val response = MutableLiveData<RequestState<Boolean>>()
-
-        response.value = RequestState.Loading
-
-        if(usuario.email == "usuario@fiap.com.br" &&
-            usuario.senha == "123456") {
-            response.value = RequestState.Success(true)
+        if (usuario.email == "teste@teste.com" &&
+            usuario.senha == "123456"
+        ) {
+            val pref = context.getSharedPreferences("lembretedecompras", 0)
+            val editor = pref.edit()
+            editor.putString("email", usuario.email)
+            editor.apply()
+            response.value = RequestState.Success("")
         } else {
-            response.value = RequestState.Error(Throwable("Usuário ou senha inválido"))
+            response.value = RequestState.Error(Exception("Usuário ou senha invalido"))
         }
 
         return response
     }
+
+    fun getUsuarioLogado(): LiveData<RequestState<String>> {
+        val response = MutableLiveData<RequestState<String>>()
+
+        val pref = context.getSharedPreferences("lembretedecompras", 0)
+        val email = pref.getString("email", "") ?: ""
+        response.value = RequestState.Success(email)
+
+        return response
+    }
+
+
 }
