@@ -1,4 +1,4 @@
-# FIAP Lembrete/Lista de compras
+# FIAP Lembrete de compras
 <p align="left">
   <img alt="GitHub language count" src="https://img.shields.io/github/languages/count/Relirk/fiap-android-listadecompras">
 
@@ -17,7 +17,7 @@
 
 :iphone: App de estudo de animações com android | Disciplina de Android da FIAP ministrada em setembro de 2020
 
-![Lambrete/Lista de compras](https://firebasestorage.googleapis.com/v0/b/portifoil-bcd7d.appspot.com/o/projects-screens%2Frelirk_android_lembrete_de_compras.png?alt=media&token=a8baabf1-d27f-4fcc-8edc-6462072e1a0f)
+![Lambrete de compras](https://firebasestorage.googleapis.com/v0/b/portifoil-bcd7d.appspot.com/o/projects-screens%2Frelirk_android_lembrete_de_compras.png?alt=media&token=a8baabf1-d27f-4fcc-8edc-6462072e1a0f)
 
 ### Tools used:
 - [Kotlin](https://kotlinlang.org/)
